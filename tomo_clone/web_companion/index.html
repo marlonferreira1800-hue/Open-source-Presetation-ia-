@@ -1,99 +1,157 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tomo AI — Sua IA Pessoal Proativa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tomo — Your Personal AI</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ios: {
+              blue: '#007AFF',
+              darkbg: '#000000',
+              card: '#1C1C1E',
+              subcard: '#2C2C2E',
+              border: '#38383A',
+              textGray: '#8E8E93',
+              green: '#34C759',
+              orange: '#FF9500',
+              red: '#FF3B30'
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"Plus Jakarta Sans"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif; }
+    /* iOS Custom Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(142, 142, 147, 0.3); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(142, 142, 147, 0.5); }
+    
+    /* Smooth Transitions */
+    * { transition: background-color 0.2s ease, border-color 0.2s ease; }
+    
+    /* Bubble Tails */
+    .bubble-user {
+      border-radius: 18px 18px 4px 18px;
+    }
+    .bubble-tomo {
+      border-radius: 18px 18px 18px 4px;
+    }
   </style>
 </head>
-<body class="bg-[#090D16] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-black text-white min-h-screen flex flex-col antialiased selection:bg-ios-blue selection:text-white">
 
-  <!-- Header -->
-  <header class="border-b border-slate-800/80 bg-[#090D16]/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3 flex items-center justify-between">
+  <!-- Top Navigation Bar (Apple Style) -->
+  <header class="border-b border-[#2C2C2E] bg-black/80 backdrop-blur-xl sticky top-0 z-50 px-4 py-2.5 flex items-center justify-between">
     <div class="flex items-center space-x-3">
-      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 font-bold text-lg text-white">
-        T
+      <!-- Tomo Logo / Avatar -->
+      <div class="relative">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-ios-blue to-purple-600 flex items-center justify-center font-bold text-lg text-white shadow-md shadow-ios-blue/20">
+          T
+        </div>
+        <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-ios-green border-2 border-black" title="Ativo e Proativo"></span>
       </div>
       <div>
-        <div class="flex items-center space-x-2">
-          <h1 class="font-bold text-base tracking-tight text-white">Tomo AI</h1>
-          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span> Ativo
-          </span>
+        <div class="flex items-center space-x-1.5">
+          <h1 class="font-bold text-sm tracking-tight text-white flex items-center">
+            Tomo
+            <svg class="w-3.5 h-3.5 ml-1 text-ios-blue inline fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </h1>
         </div>
-        <p class="text-xs text-slate-400">Accountability Partner & Personal Agent</p>
+        <p class="text-[11px] text-ios-textGray font-medium">Your Personal AI • Texts you first</p>
       </div>
     </div>
 
-    <!-- Git Auto-Save & User Selector -->
-    <div class="flex items-center space-x-2 text-xs">
+    <!-- Center Segmented Control Tabs (Desktop / Tablet) -->
+    <div class="hidden md:flex items-center bg-[#1C1C1E] p-1 rounded-full border border-[#2C2C2E] text-xs font-semibold">
+      <button onclick="switchTab('chat')" id="tabBtnChat" class="px-4 py-1.5 rounded-full bg-ios-blue text-white shadow-sm transition">Conversa</button>
+      <button onclick="switchTab('apps')" id="tabBtnApps" class="px-4 py-1.5 rounded-full text-ios-textGray hover:text-white transition">Mini-Apps</button>
+      <button onclick="switchTab('calendar')" id="tabBtnCal" class="px-4 py-1.5 rounded-full text-ios-textGray hover:text-white transition">Agenda</button>
+      <button onclick="switchTab('memory')" id="tabBtnMem" class="px-4 py-1.5 rounded-full text-ios-textGray hover:text-white transition">Memória</button>
+    </div>
+
+    <!-- Header Actions (Git Auto-Save, User & Theme) -->
+    <div class="flex items-center space-x-2">
       <!-- Git Auto-Save Button -->
-      <button onclick="triggerGitAutoSave()" id="gitSyncBtn" class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/60 rounded-lg transition" title="Salvar e Comitar no GitHub">
-        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-        <span id="gitBtnLabel" class="font-medium text-[11px]">Git Sync</span>
+      <button onclick="triggerGitAutoSave()" id="gitSyncBtn" class="flex items-center space-x-1 px-3 py-1.5 bg-[#1C1C1E] hover:bg-[#2C2C2E] text-xs font-medium text-slate-200 border border-[#2C2C2E] rounded-full transition" title="Auto-Save & Push direto para o GitHub">
+        <svg class="w-3.5 h-3.5 text-ios-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+        <span id="gitBtnLabel">Git Sync</span>
       </button>
 
-      <span class="text-slate-400 hidden sm:inline">Perfil:</span>
-      <input type="text" id="userIdInput" value="marlon_dev" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1 text-slate-200 text-xs focus:outline-none focus:border-indigo-500" title="ID do Usuário">
-      <button onclick="refreshUserData()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition" title="Recarregar Dados">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-      </button>
+      <!-- Profile Selector -->
+      <input type="text" id="userIdInput" value="marlon_dev" class="w-24 bg-[#1C1C1E] border border-[#2C2C2E] rounded-full px-3 py-1 text-[11px] text-white focus:outline-none focus:border-ios-blue text-center font-medium" title="ID do Perfil">
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+  <!-- Main View Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-    <!-- Left Column: Chat Area (iMessage Style) (7 Cols) -->
-    <section class="lg:col-span-7 flex flex-col bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden h-[75vh] lg:h-[84vh] shadow-xl">
-      <!-- Proactive Simulator Bar -->
-      <div class="bg-slate-950/60 border-b border-slate-800/80 px-4 py-2.5 flex items-center justify-between text-xs overflow-x-auto gap-2">
-        <span class="text-slate-400 text-[11px] font-semibold whitespace-nowrap uppercase tracking-wider flex items-center">
-          <svg class="w-3.5 h-3.5 mr-1 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          Gatilhos Proativos:
+    <!-- LEFT COLUMN: iMessage Style Conversational Feed (7 Columns) -->
+    <section id="chatSection" class="lg:col-span-7 flex flex-col bg-[#121214] border border-[#242426] rounded-3xl overflow-hidden h-[78vh] lg:h-[85vh] shadow-2xl relative">
+      
+      <!-- Proactive Quick-Trigger Bar -->
+      <div class="bg-[#18181A]/90 border-b border-[#2C2C2E] px-3 py-2 flex items-center justify-between text-xs gap-1.5 overflow-x-auto">
+        <span class="text-[10px] uppercase font-bold text-ios-textGray tracking-wider flex items-center shrink-0">
+          <span class="w-2 h-2 rounded-full bg-ios-orange mr-1.5"></span>
+          Simular Nudge:
         </span>
-        <div class="flex items-center space-x-1.5">
-          <button onclick="triggerProactive('morning')" class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-indigo-600/30 hover:text-indigo-300 text-slate-300 border border-slate-700/60 transition text-[11px]">🌅 Manhã</button>
-          <button onclick="triggerProactive('midday')" class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-indigo-600/30 hover:text-indigo-300 text-slate-300 border border-slate-700/60 transition text-[11px]">⚡ Meio do Dia</button>
-          <button onclick="triggerProactive('evening')" class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-indigo-600/30 hover:text-indigo-300 text-slate-300 border border-slate-700/60 transition text-[11px]">🌙 Noite</button>
-          <button onclick="triggerProactive('inactivity')" class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-amber-600/30 hover:text-amber-300 text-slate-300 border border-slate-700/60 transition text-[11px]">👀 Inatividade</button>
+        <div class="flex items-center space-x-1 shrink-0">
+          <button onclick="triggerProactive('morning')" class="px-2.5 py-1 rounded-full bg-[#242428] hover:bg-ios-blue hover:text-white text-slate-300 text-[11px] transition font-medium">🌅 Manhã</button>
+          <button onclick="triggerProactive('midday')" class="px-2.5 py-1 rounded-full bg-[#242428] hover:bg-ios-blue hover:text-white text-slate-300 text-[11px] transition font-medium">⚡ Tarde</button>
+          <button onclick="triggerProactive('evening')" class="px-2.5 py-1 rounded-full bg-[#242428] hover:bg-ios-blue hover:text-white text-slate-300 text-[11px] transition font-medium">🌙 Noite</button>
+          <button onclick="triggerProactive('inactivity')" class="px-2.5 py-1 rounded-full bg-[#242428] hover:bg-ios-red hover:text-white text-slate-300 text-[11px] transition font-medium">👀 Cobrança</button>
         </div>
       </div>
 
-      <!-- Messages Stream -->
-      <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
-        <!-- Initial Message -->
-        <div class="flex items-start space-x-3">
-          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-xs text-white shrink-0 mt-0.5">T</div>
-          <div class="bg-slate-800/90 text-slate-200 border border-slate-700/50 rounded-2xl rounded-tl-sm px-4 py-3 text-sm max-w-[85%] leading-relaxed shadow-sm">
-            E aí! Sou o Tomo. Estou aqui para manter você focado nas suas metas e rotinas.<br><br>
-            O que você quer cumprir hoje ou qual hábito quer consolidar esta semana?
+      <!-- Messages Stream (iOS Chat bubbles) -->
+      <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3.5">
+        <!-- Date Stamp -->
+        <div class="text-center my-2">
+          <span class="text-[10px] font-semibold text-ios-textGray uppercase tracking-widest bg-[#1C1C1E] px-3 py-0.5 rounded-full">Hoje</span>
+        </div>
+
+        <!-- Tomo Initial Bubble -->
+        <div class="flex items-end space-x-2">
+          <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-ios-blue to-purple-600 flex items-center justify-center font-bold text-xs text-white shrink-0 mb-0.5">T</div>
+          <div class="bg-[#1C1C1E] text-white border border-[#2C2C2E] bubble-tomo px-4 py-2.5 text-sm max-w-[85%] leading-relaxed shadow-sm">
+            E aí, Marlon! Sou o Tomo.<br><br>
+            Estou aqui para acompanhar sua rotina, saúde e metas. Me conte o que você planejou para hoje, me mande fotos de refeições ou me peça para bloquear horários no seu calendário!
           </div>
         </div>
       </div>
 
-      <!-- Input Area with Multimodal Controls -->
-      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex flex-col space-y-2">
-        <!-- Image Preview Container -->
-        <div id="imagePreviewContainer" class="hidden items-center space-x-2 bg-slate-900 border border-slate-700/80 rounded-xl p-2 w-fit">
-          <img id="imagePreview" src="" alt="Preview" class="h-14 w-14 object-cover rounded-lg border border-slate-700">
+      <!-- Typing Indicator (Hidden by default) -->
+      <div id="typingIndicator" class="hidden px-5 py-2 flex items-center space-x-1.5 text-xs text-ios-textGray">
+        <div class="w-1.5 h-1.5 rounded-full bg-ios-textGray animate-bounce"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-ios-textGray animate-bounce" style="animation-delay: 0.15s"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-ios-textGray animate-bounce" style="animation-delay: 0.3s"></div>
+        <span class="text-[11px] ml-1">Tomo está digitando...</span>
+      </div>
+
+      <!-- Input Bar (Apple iMessage Style) -->
+      <div class="p-3 bg-[#121214] border-t border-[#242426] flex flex-col space-y-2">
+        <!-- Image Preview Thumbnail -->
+        <div id="imagePreviewContainer" class="hidden items-center space-x-2 bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-2 w-fit">
+          <img id="imagePreview" src="" alt="Preview" class="h-12 w-12 object-cover rounded-xl border border-[#38383A]">
           <div class="flex flex-col pr-2">
-            <span class="text-[11px] font-medium text-slate-300">Foto Anexada</span>
-            <span class="text-[10px] text-slate-500">Refeição / Print / Recibo</span>
-            <button onclick="clearSelectedImage()" class="text-xs text-rose-400 hover:text-rose-300 text-left mt-0.5">Remover ✕</button>
+            <span class="text-[11px] font-semibold text-white">Foto Anexada</span>
+            <span class="text-[10px] text-ios-textGray">Prato / Print / Extrato</span>
+            <button onclick="clearSelectedImage()" class="text-[11px] text-ios-red hover:underline text-left mt-0.5">Remover ✕</button>
           </div>
         </div>
 
@@ -101,87 +159,88 @@
           <!-- Hidden File Input -->
           <input type="file" id="imageFileInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
           
-          <!-- Image Attachment Button -->
-          <button type="button" onclick="document.getElementById('imageFileInput').click()" class="p-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-indigo-400 border border-slate-700 rounded-xl transition shadow-sm" title="Anexar foto de refeição, print ou recibo">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          <!-- Attachment Button (+) -->
+          <button type="button" onclick="document.getElementById('imageFileInput').click()" class="w-10 h-10 rounded-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-ios-blue flex items-center justify-center transition border border-[#2C2C2E]" title="Anexar foto de refeição ou print">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v16m8-8H4"/></svg>
           </button>
 
-          <!-- Voice / Audio Record Button -->
-          <button type="button" id="recordAudioBtn" onclick="toggleVoiceRecording()" class="p-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 border border-slate-700 rounded-xl transition shadow-sm" title="Gravar mensagem de voz (Whisper)">
-            <svg id="micIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-            <span id="recordingIndicator" class="hidden w-3 h-3 rounded-full bg-rose-500 animate-ping"></span>
+          <!-- Voice Memo Button (Mic) -->
+          <button type="button" id="recordAudioBtn" onclick="toggleVoiceRecording()" class="w-10 h-10 rounded-full bg-[#1C1C1E] hover:bg-[#2C2C2E] text-ios-textGray hover:text-ios-red flex items-center justify-center transition border border-[#2C2C2E]" title="Gravar áudio (Whisper)">
+            <svg id="micIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+            <span id="recordingIndicator" class="hidden w-3 h-3 rounded-full bg-ios-red animate-ping"></span>
           </button>
 
-          <input type="text" id="chatInput" placeholder="Digite uma meta, anexe uma foto ou grave um áudio..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" onkeydown="if(event.key === 'Enter') sendMessage()">
+          <!-- Text Input Field -->
+          <input type="text" id="chatInput" placeholder="iMessage para o Tomo..." class="flex-1 bg-[#1C1C1E] border border-[#2C2C2E] rounded-full px-4 py-2.5 text-sm text-white placeholder-ios-textGray focus:outline-none focus:border-ios-blue transition" onkeydown="if(event.key === 'Enter') sendMessage()">
           
-          <button onclick="sendMessage()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl font-medium text-sm transition flex items-center space-x-1.5 shadow-lg shadow-indigo-600/25">
-            <span>Enviar</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          <!-- Send Arrow Button -->
+          <button onclick="sendMessage()" id="sendBtn" class="w-10 h-10 rounded-full bg-ios-blue hover:bg-blue-600 text-white flex items-center justify-center transition shadow-md shadow-ios-blue/30 shrink-0">
+            <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5m-7 7l7-7 7 7"/></svg>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Right Column: Dynamic Mini-Apps & Live Memory (5 Cols) -->
-    <section class="lg:col-span-5 flex flex-col space-y-5 h-[75vh] lg:h-[84vh] overflow-y-auto pr-1">
+    <!-- RIGHT COLUMN: Dynamic Mini-Apps, Calendar & Memory (5 Columns) -->
+    <section id="sideSection" class="lg:col-span-5 flex flex-col space-y-4 h-[78vh] lg:h-[85vh] overflow-y-auto pr-0.5">
 
-      <!-- Dynamic Mini-Apps Card -->
-      <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+      <!-- CARD 1: Dynamic Mini-Apps (Core Tomo Feature) -->
+      <div id="paneApps" class="bg-[#121214] border border-[#242426] rounded-3xl p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-3 border-b border-[#242426] pb-2.5">
           <div class="flex items-center space-x-2">
-            <span class="p-1.5 bg-indigo-500/10 text-indigo-400 rounded-lg">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            </span>
-            <h2 class="font-semibold text-sm text-white">Mini-Apps Dinâmicos</h2>
+            <div class="p-1.5 bg-ios-blue/10 text-ios-blue rounded-xl">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            </div>
+            <h2 class="font-bold text-sm text-white">Mini-Apps Dinâmicos</h2>
           </div>
-          <span class="text-[11px] text-slate-400">Gerados sob medida</span>
+          <span class="text-[10px] bg-ios-blue/10 text-ios-blue px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Gerados por IA</span>
         </div>
 
         <div id="miniAppsList" class="space-y-3">
-          <p class="text-xs text-slate-500 text-center py-4">Nenhum Mini-App gerado ainda. Conte ao Tomo uma meta para gerar um!</p>
+          <p class="text-xs text-ios-textGray text-center py-6 font-medium">Nenhum Mini-App gerado ainda.<br>Diga ao Tomo uma meta (ex.: "Quero treinar 5x") para gerar um app sob medida!</p>
         </div>
       </div>
 
-      <!-- Google Calendar Sync Card -->
-      <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+      <!-- CARD 2: Google Calendar Integration -->
+      <div id="paneCalendar" class="bg-[#121214] border border-[#242426] rounded-3xl p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-3 border-b border-[#242426] pb-2.5">
           <div class="flex items-center space-x-2">
-            <span class="p-1.5 bg-blue-500/10 text-blue-400 rounded-lg">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            </span>
-            <h2 class="font-semibold text-sm text-white">Google Calendar (Hoje)</h2>
+            <div class="p-1.5 bg-blue-500/10 text-blue-400 rounded-xl">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <h2 class="font-bold text-sm text-white">Google Calendar (Hoje)</h2>
           </div>
-          <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 font-medium">Sincronizado</span>
+          <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Sincronizado</span>
         </div>
-        <div id="calendarEventsContainer" class="space-y-1.5 text-xs">
-          <p class="text-slate-500 italic">Carregando agenda...</p>
+        <div id="calendarEventsContainer" class="space-y-2 text-xs">
+          <p class="text-ios-textGray italic">Carregando compromissos...</p>
         </div>
       </div>
 
-      <!-- Live Memory Inspector Card -->
-      <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+      <!-- CARD 3: Continuous Long-Term Memory Profile -->
+      <div id="paneMemory" class="bg-[#121214] border border-[#242426] rounded-3xl p-4 shadow-xl flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-3 border-b border-[#242426] pb-2.5">
           <div class="flex items-center space-x-2">
-            <span class="p-1.5 bg-purple-500/10 text-purple-400 rounded-lg">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-            </span>
-            <h2 class="font-semibold text-sm text-white">Memória Contínua (Perfil Vivo)</h2>
+            <div class="p-1.5 bg-purple-500/10 text-purple-400 rounded-xl">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            </div>
+            <h2 class="font-bold text-sm text-white">Memória Contínua (Perfil Vivo)</h2>
           </div>
-          <span class="text-[11px] text-slate-400">Contexto Injetado</span>
+          <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Contexto</span>
         </div>
 
         <div class="space-y-4 text-xs overflow-y-auto flex-1">
           <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Metas Ativas:</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-ios-textGray block mb-2">Metas Ativas:</span>
             <div id="goalsContainer" class="space-y-1.5">
-              <p class="text-slate-500 italic">Nenhuma meta ativa ainda.</p>
+              <p class="text-ios-textGray italic">Nenhuma meta ativa ainda.</p>
             </div>
           </div>
 
           <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Fatos & Hábitos Memorizados:</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-ios-textGray block mb-2">Fatos & Hábitos Memorizados:</span>
             <div id="memoriesContainer" class="space-y-1.5">
-              <p class="text-slate-500 italic">Nenhum fato memorizado ainda.</p>
+              <p class="text-ios-textGray italic">Nenhum fato memorizado ainda.</p>
             </div>
           </div>
         </div>
@@ -199,6 +258,26 @@
 
     function getUserId() {
       return document.getElementById("userIdInput").value.trim() || "marlon_dev";
+    }
+
+    function switchTab(tab) {
+      const tabs = ['chat', 'apps', 'calendar', 'memory'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        if (btn) {
+          if (t === tab) {
+            btn.className = "px-4 py-1.5 rounded-full bg-ios-blue text-white shadow-sm transition";
+          } else {
+            btn.className = "px-4 py-1.5 rounded-full text-ios-textGray hover:text-white transition";
+          }
+        }
+      });
+
+      // Mobile scroll into view if applicable
+      if (tab === 'apps') document.getElementById('paneApps').scrollIntoView({ behavior: 'smooth' });
+      else if (tab === 'calendar') document.getElementById('paneCalendar').scrollIntoView({ behavior: 'smooth' });
+      else if (tab === 'memory') document.getElementById('paneMemory').scrollIntoView({ behavior: 'smooth' });
+      else document.getElementById('chatSection').scrollIntoView({ behavior: 'smooth' });
     }
 
     function handleImageSelect(event) {
@@ -244,7 +323,7 @@
             const reader = new FileReader();
             reader.onloadend = async () => {
               const audioBase64 = reader.result;
-              appendMessage("user", "🎙️ Mensagem de voz gravada...");
+              appendMessage("user", "🎙️ [Áudio gravado e enviado para transcrição Whisper]");
               await sendPayload({ user_id: getUserId(), audio_base64: audioBase64, channel: "web" });
             };
             reader.readAsDataURL(audioBlob);
@@ -252,16 +331,16 @@
 
           mediaRecorder.start();
           isRecording = true;
-          recordBtn.classList.add("bg-rose-950", "border-rose-500", "text-rose-400");
+          recordBtn.classList.add("bg-ios-red/20", "border-ios-red", "text-ios-red");
           micIcon.classList.add("hidden");
           indicator.classList.remove("hidden");
         } catch (err) {
-          alert("Permissão de microfone negada ou indisponível no navegador.");
+          alert("Permissão de microfone negada ou indisponível.");
         }
       } else {
         mediaRecorder.stop();
         isRecording = false;
-        recordBtn.classList.remove("bg-rose-950", "border-rose-500", "text-rose-400");
+        recordBtn.classList.remove("bg-ios-red/20", "border-ios-red", "text-ios-red");
         micIcon.classList.remove("hidden");
         indicator.classList.add("hidden");
       }
@@ -276,9 +355,9 @@
 
       input.value = "";
       if (image && text) {
-        appendMessage("user", `[📸 Foto anexada]\n${text}`);
+        appendMessage("user", `📸 [Foto Anexada]\n${text}`);
       } else if (image) {
-        appendMessage("user", "[📸 Foto anexada enviada]");
+        appendMessage("user", "📸 [Foto de Refeição/Extrato Enviada]");
       } else {
         appendMessage("user", text);
       }
@@ -294,6 +373,9 @@
     }
 
     async function sendPayload(payload) {
+      const indicator = document.getElementById("typingIndicator");
+      indicator.classList.remove("hidden");
+
       try {
         const res = await fetch(`${API_BASE}/api/v1/chat`, {
           method: "POST",
@@ -301,10 +383,12 @@
           body: JSON.stringify(payload)
         });
         const data = await res.json();
+        indicator.classList.add("hidden");
         appendMessage("tomo", data.reply);
         await refreshUserData();
       } catch (err) {
-        appendMessage("tomo", "⚠️ Ops, erro ao se conectar ao backend. Verifique se o servidor está rodando.");
+        indicator.classList.add("hidden");
+        appendMessage("tomo", "⚠️ Ops, falha na conexão com o servidor do Tomo.");
       }
     }
 
@@ -316,7 +400,7 @@
           body: JSON.stringify({ user_id: getUserId(), trigger_type: type })
         });
         const data = await res.json();
-        appendMessage("tomo", `🔔 **[Proativo - ${type.toUpperCase()}]**\n${data.message}`);
+        appendMessage("tomo", `🔔 **[NUDGE PROATIVO - ${type.toUpperCase()}]**\n${data.message}`);
       } catch (e) {
         console.error("Erro no gatilho proativo:", e);
       }
@@ -327,18 +411,18 @@
       const isUser = sender === "user";
       
       const msgDiv = document.createElement("div");
-      msgDiv.className = isUser ? "flex justify-end" : "flex items-start space-x-3";
+      msgDiv.className = isUser ? "flex justify-end" : "flex items-end space-x-2";
       
       const bubble = document.createElement("div");
       bubble.className = isUser
-        ? "bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[85%] leading-relaxed shadow-sm"
-        : "bg-slate-800/90 text-slate-200 border border-slate-700/50 rounded-2xl rounded-tl-sm px-4 py-3 text-sm max-w-[85%] leading-relaxed shadow-sm whitespace-pre-wrap";
+        ? "bg-ios-blue text-white bubble-user px-4 py-2.5 text-sm max-w-[85%] leading-relaxed shadow-sm font-normal"
+        : "bg-[#1C1C1E] text-white border border-[#2C2C2E] bubble-tomo px-4 py-2.5 text-sm max-w-[85%] leading-relaxed shadow-sm whitespace-pre-wrap font-normal";
       
       bubble.innerText = text;
 
       if (!isUser) {
         const avatar = document.createElement("div");
-        avatar.className = "w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-xs text-white shrink-0 mt-0.5";
+        avatar.className = "w-7 h-7 rounded-full bg-gradient-to-tr from-ios-blue to-purple-600 flex items-center justify-center font-bold text-xs text-white shrink-0 mb-0.5";
         avatar.innerText = "T";
         msgDiv.appendChild(avatar);
       }
@@ -350,8 +434,8 @@
 
     async function refreshUserData() {
       const userId = getUserId();
-      // Buscar contexto (memórias e metas)
       try {
+        // Buscar memórias e metas
         const ctxRes = await fetch(`${API_BASE}/api/v1/user/${userId}/context`);
         if (ctxRes.ok) {
           const ctx = await ctxRes.json();
@@ -377,33 +461,16 @@
       }
     }
 
-    function renderCalendar(events) {
-      const container = document.getElementById("calendarEventsContainer");
-      if (!events.length) {
-        container.innerHTML = '<p class="text-slate-500 italic">Nenhum compromisso para hoje.</p>';
-        return;
-      }
-      container.innerHTML = events.map(ev => `
-        <div class="bg-slate-800/60 border border-slate-700/50 rounded-lg p-2 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-            <span class="text-slate-200 font-medium">${ev.summary}</span>
-          </div>
-          <span class="text-blue-400 font-semibold text-[11px]">${ev.time || 'Hoje'}</span>
-        </div>
-      `).join('');
-    }
-
     function renderGoals(goals) {
       const container = document.getElementById("goalsContainer");
       if (!goals.length) {
-        container.innerHTML = '<p class="text-slate-500 italic">Nenhuma meta ativa ainda.</p>';
+        container.innerHTML = '<p class="text-ios-textGray italic">Nenhuma meta ativa ainda.</p>';
         return;
       }
       container.innerHTML = goals.map(g => `
-        <div class="bg-slate-800/60 border border-slate-700/50 rounded-lg p-2 flex items-center justify-between">
-          <span class="font-medium text-slate-200">${g.title}</span>
-          <span class="text-indigo-400 font-semibold">${g.target ? `${g.target} ${g.unit || ''}` : 'Ativo'}</span>
+        <div class="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-2.5 flex items-center justify-between">
+          <span class="font-semibold text-white text-xs">${g.title}</span>
+          <span class="text-ios-blue font-bold text-[11px] bg-ios-blue/10 px-2 py-0.5 rounded-full">${g.target ? `${g.target} ${g.unit || ''}` : 'Ativo'}</span>
         </div>
       `).join('');
     }
@@ -411,13 +478,30 @@
     function renderMemories(memories) {
       const container = document.getElementById("memoriesContainer");
       if (!memories.length) {
-        container.innerHTML = '<p class="text-slate-500 italic">Nenhum fato memorizado ainda.</p>';
+        container.innerHTML = '<p class="text-ios-textGray italic">Nenhum fato memorizado ainda.</p>';
         return;
       }
       container.innerHTML = memories.map(m => `
-        <div class="bg-slate-850 bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-300 flex items-start space-x-2">
-          <span class="text-indigo-400 mt-0.5">•</span>
-          <span class="leading-snug">${m.fact}</span>
+        <div class="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-2.5 text-slate-300 flex items-start space-x-2">
+          <span class="text-ios-blue mt-0.5">•</span>
+          <span class="leading-snug text-xs">${m.fact}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderCalendar(events) {
+      const container = document.getElementById("calendarEventsContainer");
+      if (!events.length) {
+        container.innerHTML = '<p class="text-ios-textGray italic">Nenhum compromisso para hoje.</p>';
+        return;
+      }
+      container.innerHTML = events.map(ev => `
+        <div class="bg-[#1C1C1E] border border-[#2C2C2E] rounded-2xl p-2.5 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+            <span class="text-white font-medium text-xs">${ev.summary}</span>
+          </div>
+          <span class="text-blue-400 font-semibold text-[11px] bg-blue-500/10 px-2 py-0.5 rounded-full">${ev.time || 'Hoje'}</span>
         </div>
       `).join('');
     }
@@ -425,7 +509,7 @@
     function renderMiniApps(apps) {
       const container = document.getElementById("miniAppsList");
       if (!apps.length) {
-        container.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">Nenhum Mini-App gerado ainda. Conte ao Tomo uma meta para gerar um!</p>';
+        container.innerHTML = '<p class="text-xs text-ios-textGray text-center py-6 font-medium">Nenhum Mini-App gerado ainda.<br>Diga ao Tomo uma meta (ex.: "Quero treinar 5x") para gerar um app sob medida!</p>';
         return;
       }
 
@@ -441,32 +525,32 @@
             const target = compState.target || 1;
             const pct = Math.min(100, Math.round((cur / target) * 100));
             return `
-              <div class="mt-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/40">
-                <div class="flex justify-between text-[11px] mb-1 font-medium">
-                  <span class="text-slate-300">${c.title}</span>
-                  <span class="text-indigo-400">${cur} / ${target} ${compState.unit || ''} (${pct}%)</span>
+              <div class="mt-2.5 bg-[#1C1C1E] p-3 rounded-2xl border border-[#2C2C2E]">
+                <div class="flex justify-between text-xs mb-1.5 font-medium">
+                  <span class="text-slate-200">${c.title}</span>
+                  <span class="text-ios-blue font-bold">${cur} / ${target} ${compState.unit || ''} (${pct}%)</span>
                 </div>
-                <div class="w-full bg-slate-700/50 rounded-full h-2 overflow-hidden">
-                  <div class="bg-indigo-500 h-2 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                <div class="w-full bg-[#2C2C2E] rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-gradient-to-r from-ios-blue to-purple-600 h-2.5 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
                 </div>
               </div>
             `;
           } else if (c.type === "checklist") {
             const items = (c.props && c.props.items) || [];
             return `
-              <div class="mt-2 space-y-1.5">
-                <span class="text-[11px] text-slate-400 font-medium">${c.title}</span>
+              <div class="mt-2.5 space-y-1.5">
+                <span class="text-[11px] text-ios-textGray font-semibold uppercase tracking-wider">${c.title}</span>
                 ${items.map(it => `
-                  <label class="flex items-center space-x-2 text-xs text-slate-300 bg-slate-800/40 p-2 rounded-md cursor-pointer hover:bg-slate-800/70">
-                    <input type="checkbox" onchange="toggleChecklistItem('${app.id}', '${c.id}', '${it.id}')" ${state[c.id] && state[c.id][it.id] ? 'checked' : ''} class="rounded border-slate-700 text-indigo-600 focus:ring-0">
-                    <span>${it.label}</span>
+                  <label class="flex items-center space-x-2.5 text-xs text-white bg-[#1C1C1E] p-2.5 rounded-xl cursor-pointer hover:bg-[#2C2C2E] border border-[#2C2C2E] transition">
+                    <input type="checkbox" onchange="toggleChecklistItem('${app.id}', '${c.id}', '${it.id}')" ${state[c.id] && state[c.id][it.id] ? 'checked' : ''} class="w-4 h-4 rounded-full border-[#38383A] text-ios-blue focus:ring-0">
+                    <span class="font-medium">${it.label}</span>
                   </label>
                 `).join('')}
               </div>
             `;
           } else if (c.type === "action_button") {
             return `
-              <button onclick="handleAppAction('${app.id}', '${c.props.action}', '${c.props.target_component}')" class="w-full mt-3 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white py-2 rounded-lg text-xs font-semibold border border-indigo-500/30 transition">
+              <button onclick="handleAppAction('${app.id}', '${c.props.action}', '${c.props.target_component}')" class="w-full mt-3 bg-ios-blue/15 hover:bg-ios-blue text-ios-blue hover:text-white py-2.5 rounded-2xl text-xs font-bold border border-ios-blue/30 transition shadow-sm">
                 ${c.title}
               </button>
             `;
@@ -475,12 +559,12 @@
         }).join('');
 
         return `
-          <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3 shadow-md hover:border-slate-600 transition">
+          <div class="bg-[#18181A] border border-[#2C2C2E] rounded-3xl p-4 shadow-lg hover:border-slate-600 transition">
             <div class="flex items-center justify-between">
-              <h3 class="font-bold text-sm text-indigo-300">${app.title}</h3>
-              <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">${app.app_type}</span>
+              <h3 class="font-bold text-sm text-white">${app.title}</h3>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider bg-ios-blue/10 text-ios-blue border border-ios-blue/20">${app.app_type}</span>
             </div>
-            <p class="text-xs text-slate-400 mt-1">${app.description || ''}</p>
+            <p class="text-xs text-ios-textGray mt-1">${app.description || ''}</p>
             ${componentsHtml}
           </div>
         `;

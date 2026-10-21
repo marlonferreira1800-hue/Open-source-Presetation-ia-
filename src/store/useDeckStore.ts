@@ -1,12 +1,11 @@
 import { create } from "zustand";
-import { PresentationDoc, SlideNode, SlideLayoutType, SlideElement } from "@/types/presentation";
-import { MOODS } from "@/lib/moods";
+import { PresentationDoc, SlideNode, SlideLayoutType } from "@/types/presentation";
 
 const INITIAL_DECK: PresentationDoc = {
   id: "deck_demo_1",
   title: "A Revolução da IA Corporativa",
   description: "Como modelos avançados estão redefinindo automação e produtividade",
-  moodId: "nvidia-emerald",
+  moodId: "executive-fintech",
   aspectRatio: "16:9",
   slides: [
     {
@@ -15,6 +14,7 @@ const INITIAL_DECK: PresentationDoc = {
       title: "A Próxima Fronteira da Inteligência Artificial",
       subtitle: "Arquiteturas soberanas, inferência em tempo real e orquestração autônoma de sistemas empresariais.",
       accentBadge: "Visão Executiva 2026",
+      speakerNotes: "Boas-vindas a todos. Abrir reforçando que a IA passou da fase de experimentação para a infraestrutura central dos negócios.",
       elements: [
         {
           id: "el_author",
@@ -30,6 +30,7 @@ const INITIAL_DECK: PresentationDoc = {
       title: "Impacto Mensurável de Performance",
       subtitle: "Resultados empíricos após a transição para inferência acelerada em escala",
       accentBadge: "Métricas Chave",
+      speakerNotes: "Destacar a redução de 72% de latência com a adoção de GPUs locais e modelos destilados.",
       elements: [
         {
           id: "m_1",
@@ -60,6 +61,7 @@ const INITIAL_DECK: PresentationDoc = {
       title: "Os 3 Pilares da Arquitetura Moderna",
       subtitle: "Camadas desacopladas projetadas para escalabilidade e resiliência contínua",
       accentBadge: "Fundamentos",
+      speakerNotes: "Explicar como o desacoplamento de AST e layout gráfico permite gerar decks 10x mais rápido.",
       elements: [
         {
           id: "col_1",
@@ -87,6 +89,7 @@ const INITIAL_DECK: PresentationDoc = {
       title: "Desafio vs. Solução Estrutural",
       subtitle: "Por que abordagens tradicionais falham ao gerar apresentações por IA",
       accentBadge: "Paradigma",
+      speakerNotes: "Enfatizar a fragilidade de caixas de texto com posições fixas absolutas.",
       elements: [
         {
           id: "prob_1",
@@ -108,6 +111,7 @@ const INITIAL_DECK: PresentationDoc = {
       title: "Convicção Estratégica",
       subtitle: "A premissa central que orienta a nova geração de interfaces inteligentes",
       accentBadge: "Citação",
+      speakerNotes: "Fechar com impacto e convidar a audiência para a sessão de perguntas e respostas.",
       elements: [
         {
           id: "q_text",
@@ -132,18 +136,33 @@ interface DeckStore {
   history: PresentationDoc[];
   future: PresentationDoc[];
 
+  // Panels & Views
+  isClipEOpen: boolean;
+  isThemesOpen: boolean;
+  isPresentMode: boolean;
+  isNotesOpen: boolean;
+  zoomLevel: number; // 0.25 to 1.5, default null (fit)
+
   // Actions
   setActiveSlideIndex: (index: number) => void;
   setMood: (moodId: string) => void;
   updateActiveSlideTitle: (title: string) => void;
   updateActiveSlideSubtitle: (subtitle: string) => void;
+  updateActiveSlideNotes: (notes: string) => void;
   updateSlideElement: (slideIndex: number, elementId: string, content: string, label?: string) => void;
+  updateSlideAt: (index: number, newSlide: SlideNode) => void;
   changeSlideLayout: (slideIndex: number, newLayout: SlideLayoutType) => void;
   addSlide: (layout?: SlideLayoutType) => void;
+  duplicateSlide: (slideIndex: number) => void;
   deleteSlide: (slideIndex: number) => void;
   reorderSlides: (fromIndex: number, toIndex: number) => void;
   setDeck: (deck: PresentationDoc) => void;
   setIsGenerating: (generating: boolean) => void;
+  toggleClipE: () => void;
+  toggleThemes: () => void;
+  setIsPresentMode: (val: boolean) => void;
+  toggleNotes: () => void;
+  setZoomLevel: (zoom: number) => void;
   undo: () => void;
   redo: () => void;
 }
@@ -155,7 +174,20 @@ export const useDeckStore = create<DeckStore>((set, get) => ({
   history: [],
   future: [],
 
+  // Panels
+  isClipEOpen: false,
+  isThemesOpen: false,
+  isPresentMode: false,
+  isNotesOpen: false,
+  zoomLevel: 0, // 0 = Auto-fit
+
   setActiveSlideIndex: (index) => set({ activeSlideIndex: index }),
+
+  toggleClipE: () => set((state) => ({ isClipEOpen: !state.isClipEOpen, isThemesOpen: false })),
+  toggleThemes: () => set((state) => ({ isThemesOpen: !state.isThemesOpen, isClipEOpen: false })),
+  setIsPresentMode: (isPresentMode) => set({ isPresentMode }),
+  toggleNotes: () => set((state) => ({ isNotesOpen: !state.isNotesOpen })),
+  setZoomLevel: (zoomLevel) => set({ zoomLevel }),
 
   setMood: (moodId) => {
     const { deck, history } = get();
@@ -182,6 +214,14 @@ export const useDeckStore = create<DeckStore>((set, get) => ({
     set({ deck: { ...deck, slides } });
   },
 
+  updateActiveSlideNotes: (speakerNotes) => {
+    const { deck, activeSlideIndex } = get();
+    const slides = [...deck.slides];
+    if (!slides[activeSlideIndex]) return;
+    slides[activeSlideIndex] = { ...slides[activeSlideIndex], speakerNotes };
+    set({ deck: { ...deck, slides } });
+  },
+
   updateSlideElement: (slideIndex, elementId, content, label) => {
     const { deck } = get();
     const slides = [...deck.slides];
@@ -199,13 +239,23 @@ export const useDeckStore = create<DeckStore>((set, get) => ({
     set({ deck: { ...deck, slides } });
   },
 
+  updateSlideAt: (index, newSlide) => {
+    const { deck, history } = get();
+    const slides = [...deck.slides];
+    slides[index] = newSlide;
+    set({
+      history: [...history, deck],
+      future: [],
+      deck: { ...deck, slides }
+    });
+  },
+
   changeSlideLayout: (slideIndex, newLayout) => {
     const { deck, history } = get();
     const slides = [...deck.slides];
     const target = slides[slideIndex];
     if (!target) return;
 
-    // Adapt elements to new layout if needed
     slides[slideIndex] = {
       ...target,
       layout: newLayout
@@ -224,8 +274,8 @@ export const useDeckStore = create<DeckStore>((set, get) => ({
     const newSlide: SlideNode = {
       id: newSlideId,
       layout,
-      title: "Novo Slide Estruturado",
-      subtitle: "Adicione sua descrição ou gere conteúdo automaticamente via IA",
+      title: "Novo Slide Criado",
+      subtitle: "Personalize este conteúdo ou peça para o Clip-E reescrever com IA",
       accentBadge: "Destaque",
       elements: [
         { id: "e1", type: "text", label: "Tópico Principal", content: "Conteúdo descritivo conciso e objetivo." },
@@ -245,9 +295,31 @@ export const useDeckStore = create<DeckStore>((set, get) => ({
     });
   },
 
+  duplicateSlide: (slideIndex) => {
+    const { deck, history } = get();
+    const slideToCopy = deck.slides[slideIndex];
+    if (!slideToCopy) return;
+
+    const copiedSlide: SlideNode = {
+      ...JSON.parse(JSON.stringify(slideToCopy)),
+      id: "slide_" + Math.random().toString(36).substring(2, 9),
+      title: slideToCopy.title + " (Cópia)"
+    };
+
+    const slides = [...deck.slides];
+    slides.splice(slideIndex + 1, 0, copiedSlide);
+
+    set({
+      history: [...history, deck],
+      future: [],
+      deck: { ...deck, slides },
+      activeSlideIndex: slideIndex + 1
+    });
+  },
+
   deleteSlide: (slideIndex) => {
     const { deck, activeSlideIndex, history } = get();
-    if (deck.slides.length <= 1) return; // Mantém pelo menos um slide
+    if (deck.slides.length <= 1) return;
 
     const slides = deck.slides.filter((_, idx) => idx !== slideIndex);
     const newActiveIndex = Math.min(activeSlideIndex, slides.length - 1);

@@ -3,11 +3,22 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useDeckStore } from "@/store/useDeckStore";
 import { OrigamiSlide } from "../origami/OrigamiSlide";
-import { ChevronLeft, ChevronRight, Edit3, Check } from "lucide-react";
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Edit3, 
+  Check, 
+  Minus, 
+  Plus, 
+  Maximize2, 
+  FileText, 
+  Sparkles
+} from "lucide-react";
 
 export const EditorViewport: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
+  const [userZoom, setUserZoom] = useState<number | null>(null);
   const [isEditingMetadata, setIsEditingMetadata] = useState(false);
 
   const { 
@@ -16,20 +27,27 @@ export const EditorViewport: React.FC = () => {
     setActiveSlideIndex,
     updateActiveSlideTitle,
     updateActiveSlideSubtitle,
-    updateSlideElement
+    updateActiveSlideNotes,
+    updateSlideElement,
+    isNotesOpen,
+    toggleNotes,
+    toggleClipE
   } = useDeckStore();
 
   const activeSlide = deck.slides[activeSlideIndex];
 
-  // Dynamic Scale Calculator (responsive fit to viewport)
+  // Dynamic Scale Calculator (responsive fit to available area)
   useEffect(() => {
     const handleResize = () => {
       if (!containerRef.current) return;
+      if (userZoom !== null) {
+        setScale(userZoom);
+        return;
+      }
+
       const { clientWidth, clientHeight } = containerRef.current;
-      
-      // Target slide nominal size: 1920 x 1080
       const paddingX = 80;
-      const paddingY = 80;
+      const paddingY = isNotesOpen ? 240 : 120;
       const availableW = clientWidth - paddingX;
       const availableH = clientHeight - paddingY;
 
@@ -43,13 +61,13 @@ export const EditorViewport: React.FC = () => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [userZoom, isNotesOpen]);
 
-  // Keyboard navigation (Left/Right arrow keys)
+  // Keyboard navigation (ArrowLeft & ArrowRight)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return; // Don't intercept when user is typing in input
+        return;
       }
 
       if (e.key === "ArrowLeft" && activeSlideIndex > 0) {
@@ -68,42 +86,46 @@ export const EditorViewport: React.FC = () => {
   return (
     <main 
       ref={containerRef}
-      className="flex-1 h-[calc(100vh-4rem)] bg-zinc-950 flex flex-col items-center justify-center relative overflow-hidden select-none"
+      className="flex-1 h-[calc(100vh-4rem)] bg-[#080A0F] flex flex-col items-center justify-center relative overflow-hidden select-none"
     >
-      {/* Background Grid Pattern */}
+      {/* Background Dot Grid */}
       <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{
-          backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(#ffffff 1.5px, transparent 1.5px)",
           backgroundSize: "24px 24px"
         }}
       />
 
-      {/* Floating Quick Edit Bar for Active Slide */}
-      <div className="absolute top-4 z-20 flex items-center space-x-3 bg-zinc-900/90 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-md shadow-xl text-xs text-zinc-300">
+      {/* Floating Quick Action Bar (Top Center) */}
+      <div className="absolute top-4 z-20 flex items-center space-x-2.5 bg-[#151821]/90 border border-[#232733] px-3.5 py-1.5 rounded-xl backdrop-blur-md shadow-xl text-xs text-zinc-300">
         <button
           onClick={() => setIsEditingMetadata(!isEditingMetadata)}
           className="flex items-center space-x-1.5 hover:text-white transition-colors"
         >
-          <Edit3 className="w-3.5 h-3.5 text-[#76B900]" />
-          <span>{isEditingMetadata ? "Fechar Edição" : "Editar Textos"}</span>
+          <Edit3 className="w-3.5 h-3.5 text-blue-400" />
+          <span>{isEditingMetadata ? "Fechar Textos" : "Editar Textos"}</span>
         </button>
 
         <span className="text-zinc-600">|</span>
 
-        <span className="font-mono text-zinc-400">
-          Slide {activeSlideIndex + 1} de {deck.slides.length}
-        </span>
+        <button
+          onClick={toggleClipE}
+          className="flex items-center space-x-1.5 text-blue-400 hover:text-blue-300 font-medium transition-colors"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Editar com Clip-E</span>
+        </button>
       </div>
 
-      {/* Inline Metadata Quick Editor Dropdown */}
+      {/* Inline Metadata Quick Editor Panel */}
       {isEditingMetadata && (
-        <div className="absolute top-16 z-30 w-full max-w-xl bg-zinc-900 border border-white/15 p-5 rounded-2xl shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-200">
+        <div className="absolute top-14 z-30 w-full max-w-xl bg-[#151821] border border-[#232733] p-5 rounded-2xl shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-200">
           <div className="flex justify-between items-center mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Edição Rápida do Slide</span>
             <button 
               onClick={() => setIsEditingMetadata(false)}
-              className="text-xs text-[#76B900] flex items-center space-x-1 hover:underline"
+              className="text-xs text-blue-400 flex items-center space-x-1 hover:underline font-semibold"
             >
               <Check className="w-3.5 h-3.5" />
               <span>Concluir</span>
@@ -117,7 +139,7 @@ export const EditorViewport: React.FC = () => {
                 type="text"
                 value={activeSlide.title}
                 onChange={(e) => updateActiveSlideTitle(e.target.value)}
-                className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-[#76B900] outline-none transition-colors"
+                className="w-full bg-[#0C0E14] border border-[#232733] rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none transition-colors"
               />
             </div>
 
@@ -127,19 +149,20 @@ export const EditorViewport: React.FC = () => {
                 value={activeSlide.subtitle || ""}
                 onChange={(e) => updateActiveSlideSubtitle(e.target.value)}
                 rows={2}
-                className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-[#76B900] outline-none transition-colors resize-none"
+                className="w-full bg-[#0C0E14] border border-[#232733] rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 outline-none transition-colors resize-none"
               />
             </div>
           </div>
         </div>
       )}
 
-      {/* Central Canvas Viewport Wrapper */}
+      {/* Main Slide Canvas */}
       <div
         className="relative flex items-center justify-center transition-all duration-300"
         style={{
           width: 1920 * scale,
           height: 1080 * scale,
+          marginBottom: isNotesOpen ? "140px" : "0px"
         }}
       >
         <OrigamiSlide
@@ -154,12 +177,12 @@ export const EditorViewport: React.FC = () => {
         />
       </div>
 
-      {/* Navigation Buttons (Left / Right) */}
+      {/* Navigation Arrows (Left/Right) */}
       <button
         onClick={() => activeSlideIndex > 0 && setActiveSlideIndex(activeSlideIndex - 1)}
         disabled={activeSlideIndex === 0}
-        className="absolute left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-zinc-800 border border-white/10 text-white flex items-center justify-center shadow-xl disabled:opacity-20 disabled:hover:bg-zinc-900/80 transition-all active:scale-95 z-20"
-        title="Slide Anterior (Seta Esquerda)"
+        className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#151821]/80 hover:bg-[#1E2330] border border-[#232733] text-white flex items-center justify-center shadow-xl disabled:opacity-20 disabled:hover:bg-[#151821]/80 transition-all active:scale-95 z-20"
+        title="Slide Anterior (←)"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
@@ -167,11 +190,93 @@ export const EditorViewport: React.FC = () => {
       <button
         onClick={() => activeSlideIndex < deck.slides.length - 1 && setActiveSlideIndex(activeSlideIndex + 1)}
         disabled={activeSlideIndex === deck.slides.length - 1}
-        className="absolute right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-zinc-900/80 hover:bg-zinc-800 border border-white/10 text-white flex items-center justify-center shadow-xl disabled:opacity-20 disabled:hover:bg-zinc-900/80 transition-all active:scale-95 z-20"
-        title="Próximo Slide (Seta Direita)"
+        className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#151821]/80 hover:bg-[#1E2330] border border-[#232733] text-white flex items-center justify-center shadow-xl disabled:opacity-20 disabled:hover:bg-[#151821]/80 transition-all active:scale-95 z-20"
+        title="Próximo Slide (→)"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
+
+      {/* Speaker Notes Drawer (Slides up from bottom) */}
+      {isNotesOpen && (
+        <div className="absolute bottom-16 left-0 right-0 h-36 bg-[#12151D] border-t border-[#232733] p-4 z-20 animate-in slide-in-from-bottom-6 duration-200 shadow-2xl flex flex-col">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-blue-400" />
+              <span>Notas do Apresentador (Slide 0{activeSlideIndex + 1})</span>
+            </span>
+            <button
+              onClick={toggleNotes}
+              className="text-xs text-zinc-400 hover:text-white"
+            >
+              Fechar
+            </button>
+          </div>
+
+          <textarea
+            value={activeSlide.speakerNotes || ""}
+            onChange={(e) => updateActiveSlideNotes(e.target.value)}
+            placeholder="Digite anotações e roteiro para o apresentador..."
+            className="flex-1 w-full bg-[#0C0E14] border border-[#232733] rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:border-blue-500 outline-none resize-none"
+          />
+        </div>
+      )}
+
+      {/* Floating Bottom Control Dock (Presentations.ai Signature Bar) */}
+      <div className="absolute bottom-4 z-20 flex items-center space-x-4 bg-[#12151D]/90 border border-[#232733] px-4 py-1.5 rounded-full backdrop-blur-md shadow-2xl text-xs text-zinc-300">
+        {/* Slide Counter */}
+        <div className="flex items-center space-x-1.5 font-mono">
+          <span className="font-bold text-white">0{activeSlideIndex + 1}</span>
+          <span className="text-zinc-600">/</span>
+          <span className="text-zinc-400">0{deck.slides.length}</span>
+        </div>
+
+        <div className="h-4 w-px bg-[#232733]" />
+
+        {/* Zoom Controls */}
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={() => setUserZoom(Math.max((userZoom ?? scale) - 0.1, 0.25))}
+            className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white"
+            title="Reduzir Zoom"
+          >
+            <Minus className="w-3.5 h-3.5" />
+          </button>
+
+          <span className="font-mono text-[11px] w-12 text-center text-zinc-300">
+            {Math.round(scale * 100)}%
+          </span>
+
+          <button
+            onClick={() => setUserZoom(Math.min((userZoom ?? scale) + 0.1, 1.2))}
+            className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white"
+            title="Aumentar Zoom"
+          >
+            <Plus className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={() => setUserZoom(null)}
+            className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white text-[11px] font-medium px-1.5"
+            title="Ajustar à tela automaticamente"
+          >
+            Fit
+          </button>
+        </div>
+
+        <div className="h-4 w-px bg-[#232733]" />
+
+        {/* Notes Toggle */}
+        <button
+          onClick={toggleNotes}
+          className={`flex items-center space-x-1 px-2 py-1 rounded transition-colors ${
+            isNotesOpen ? "bg-blue-600/20 text-blue-400" : "hover:bg-white/10 text-zinc-400 hover:text-white"
+          }`}
+          title="Alternar anotações do slide"
+        >
+          <FileText className="w-3.5 h-3.5" />
+          <span>Notas</span>
+        </button>
+      </div>
     </main>
   );
 };
