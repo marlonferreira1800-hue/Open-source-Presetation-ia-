@@ -1,0 +1,191 @@
+<!doctype html><html ng-app="PDListing"><head><meta name="robots" content="noindex, nofollow"/><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><script>(function () {
+                // --- config (MUST match your website + app snippets) ---
+                var COOKIE_NAME    = "pai_unq_tco_2025";
+                var ROOT_SUFFIX    = "presentations.ai";
+                var COOKIE_MAX_AGE = 60*60*24*365; // 1 year
+
+                // --- utils ---
+                function uuidv4() {
+                    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, function(c){
+                        return (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> (c/4)).toString(16);
+                    });
+                }
+                function getCookie(name) {
+                    var m = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,'\\$&') + '=([^;]*)'));
+                    return m ? decodeURIComponent(m[1]) : null;
+                }
+                function setCookie(name, value, maxAge) {
+                    var parts = [ name + "=" + encodeURIComponent(value), "Path=/" ];
+                    if (location.hostname === ROOT_SUFFIX || location.hostname.endsWith("." + ROOT_SUFFIX)) {
+                        parts.push("Domain=." + ROOT_SUFFIX, "SameSite=None");   // shared with the app/signup
+                    }
+                    if (maxAge) parts.push("Max-Age=" + maxAge);
+                    if (location.protocol === "https:") parts.push("Secure");
+                    document.cookie = parts.join("; ");
+                }
+                function originFrom(url){ try { return url ? new URL(url).origin : undefined; } catch (e) { return undefined; } }
+                function getAllQueryParams(){ var p=new URLSearchParams(location.search),o={}; p.forEach(function(v,k){o[k]=v;}); return o; }
+
+                // --- reuse an existing id so it stays consistent with marketing-site / app ---
+                // Stays shape-agnostic: reads BOTH the flat shape and any legacy nested cookie.
+                function readId() {
+                    var raw = getCookie(COOKIE_NAME);
+                    if (raw) {
+                        try {
+                            var o = JSON.parse(raw);
+                            var inner = (o && o[COOKIE_NAME]) || o;   // flat first, fall back to legacy nested
+                            if (inner && inner.pai_unq_id) return inner.pai_unq_id;
+                        } catch (e) {}
+                    }
+                    return null;
+                }
+
+                var id = readId();
+                if (!id) {
+                    // First touch is THIS shared deck → capture it for attribution
+                    var params  = getAllQueryParams();
+                    var payload = Object.assign({}, params, {
+                        pai_unq_id:     uuidv4(),
+                        timestamp:      new Date().toISOString(),
+                        referrer:       document.referrer || undefined,
+                        originReferrer: originFrom(document.referrer),
+                        landing_page:   location.pathname + location.search
+                    });
+                    id = payload.pai_unq_id;
+
+                    // FLAT shape — matches cookie 2 / the marketing-site snippet
+                    var value = JSON.stringify(payload);
+                    if (value.length > 3500) {
+                        value = JSON.stringify({
+                            pai_unq_id:     payload.pai_unq_id,
+                            timestamp:      payload.timestamp,
+                            referrer:       payload.referrer,
+                            originReferrer: payload.originReferrer,
+                            landing_page:   payload.landing_page
+                        });
+                    }
+                    setCookie(COOKIE_NAME, value, COOKIE_MAX_AGE);
+                }
+
+                // --- expose for the doc_load / signup event tracking ---
+                window.PAI_UNQ_ID  = id;
+                window.getPaiUnqId = function () { return window.PAI_UNQ_ID || readId(); };
+            })();</script><script src="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.0-dev.4/quill.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.2/jszip.min.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/><link rel="preconnect" href="https://js.chargebee.com" crossorigin/><style>@font-face {
+                font-family: "appicon";
+                src: url("/assets/fonts/appicon.eot?abc123");
+                src: url("/assets/fonts/appicon.eot?abc123#iefix") format("embedded-opentype"), url("/assets/fonts/appicon.ttf?abc123") format("truetype"), url("/assets/fonts/appicon.woff?abc123") format("woff");
+                font-weight: normal;
+                font-style: normal;
+            }
+            .mLoader {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                position: relative;
+                animation: rotate 1.5s linear infinite;
+            }
+
+            .mLoader::before,
+            .mLoader::after {
+                content: "";
+                box-sizing: border-box;
+                position: absolute;
+                inset: 0px;
+                border-radius: 50%;
+                border: 4px solid #e0e0e0;
+                animation: clipAnimation 2s linear infinite;
+            }
+
+            .mLoader::after {
+                transform: rotate3d(90, 90, 0, 180deg);
+                border-color: #0055ED;
+            }
+
+            @keyframes rotate {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @keyframes clipAnimation {
+                0% {
+                    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+                }
+
+                100% {
+                    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+                }
+            }</style><script>// Globals still read (bare or via window.*) by the app bundle and the
+            // components lib (IndexStore, TrackUtil, PresentScreen, PresentAnalyticsUtil, ...).
+            // Server / asset URLs
+            var staticUrl = "https://cdn.prod.presentations.ai";
+            var serverUrl = "https://app.presentations.ai";
+            var appBaseURL = "https://app.presentations.ai" + "/";
+            var analyticsUrl = "{{PITCHDECK_TRACK_URL}}";
+
+            // User identity (tracking/analytics)
+            var userId = "{{USER.id}}";
+            var userMail = "{{USER.userid}}";
+            var uid = "{{uid}}";
+            var userName = "";
+
+            // Document / session
+            var docId = "{{docId}}";
+            var ssid = "{{ssid}}";
+            var stt = new Date().getTime();
+            var GLOBAL_DOC_NAME = "My Presentation";
+            var GLOBAL_NEW_DOC = "{{GLOBAL_NEW_DOC}}" === "false" ? false : true;
+            var nextUrl = decodeURIComponent("{{{nextUrl}}}");
+            var appcode = "{{appcode}}";
+
+            // App-mode flags
+            var isWebApp = true;
+            var isWidget = false;
+            var embed = false;
+            var isHeadlessSource = "msteam" === "{{source}}" ? true : false;
+            var IS_API_SERVER = "{{IS_API_SERVER}}" === "true";
+
+            // Widget / present options
+            var showLogo = "true" === "{{showLogo}}" ? true : false;
+            var widgetAutoPlay = "true" === "{{AUTO_PLAY}}" ? true : false;
+            var widgetAutoLoop = "true" === "{{AUTO_LOOP}}" ? true : false;
+            var widgetAnimation = "true" === "{{animation}}" ? true : false;
+            var splashUrl = "";
+            var splashForm = "";
+
+            // Meeting mode
+            var meetingid = 0;
+            var isMeeting = false;
+            var meetingRole = "";
+            var url = window.location.href;
+
+            // Static hosts do no server-side templating, so any global above can arrive as a
+            // literal placeholder token instead of a value. Those are truthy garbage — window.docId
+            // is used as a deck-id fallback, analyticsUrl as a tracking base — so blank them out
+            // and let each consumer's own fallback run.
+            (function scrubUnrenderedPlaceholders() {
+                var names = ["staticUrl", "analyticsUrl", "userId", "userMail", "uid", "docId", "ssid", "nextUrl", "appcode"];
+                for (var i = 0; i < names.length; i++) {
+                    var value = window[names[i]];
+                    if (typeof value === "string" && value.indexOf("{" + "{") !== -1) window[names[i]] = "";
+                }
+            })();
+
+            // Path-style editor deep links (/edit/<docId>): the old server set docedit and this
+            // rewrites the URL into the hash route the SPA router reads. Static hosts do no
+            // server-side templating, so the placeholder arrives verbatim and the guard below
+            // keeps this a no-op. Keep it plain JS — a bare server-template block here is a
+            // syntax error that kills this whole script (and every global above it).
+            var docEditFlag = "{{docedit}}";
+            if (docEditFlag && docEditFlag !== "false" && docEditFlag.indexOf("docedit") === -1) {
+                var docEditUrl = window.location.href.replace("{{serverUrl}}", "");
+                history.pushState(null, "", "/#" + docEditUrl);
+            }</script><script defer="defer" src="https://cdn.prod.presentations.ai/brand/pai/pai.js?4e2596ae933405354e18"></script><script defer="defer" src="https://cdn.prod.presentations.ai/libv2/js-apputils.js?4e2596ae933405354e18"></script><script defer="defer" src="https://cdn.prod.presentations.ai/libv2/js-chart-new.js?4e2596ae933405354e18"></script><script defer="defer" src="https://cdn.prod.presentations.ai/libv2/lodash.min.js?4e2596ae933405354e18"></script><script defer="defer" src="https://cdn.prod.presentations.ai/libv2/lottie.js?4e2596ae933405354e18"></script><script defer="defer" src="https://cdn.prod.presentations.ai/bundle.66f8b84b54cdf9558c5b.js"></script><link href="https://cdn.prod.presentations.ai/brand/pai/pai.ico" rel="icon" type="image/x-icon"><link href="https://cdn.prod.presentations.ai/brand/pai/pai.css?4e2596ae933405354e18" rel="stylesheet"><link href="https://cdn.prod.presentations.ai/libv2/chartnew.css?4e2596ae933405354e18" rel="stylesheet"><link href="https://cdn.prod.presentations.ai/libv2/fontListCss.css?4e2596ae933405354e18" rel="stylesheet"><link href="https://cdn.prod.presentations.ai/main.4e2596ae933405354e18.css" rel="stylesheet"></head><body><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=" +tagmanagerid height="0" width="0" style="display: none; visibility: hidden"></iframe></noscript><div id="root"></div><div id="rootmodel" class="z-50 absolute top-0 left-0"></div><div id="pdloader"></div><div id="bundleLoader" style="position: absolute; left: 0; top: 0; background: #ffffff; width: 100vw; height: 100vh; max-height: 100svh; position: absolute; top: 0px; left: 0px; overflow: hidden; display: flex; justify-content: center; align-items: center; z-index: 999999"><div style="background: #ffffff; display: flex; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; max-height: 100svh"><div id="bundleLoaderProgressBar" class="mLoader"></div></div><img id="appBaseLogo" style="width: auto; height: 32px; position: fixed; bottom: 40px; left: 0;right:0;margin:auto"/></div><div id="nudge-root"></div><script>document.getElementById("appBaseLogo").src = "/assets/images/brandicons/applogo.png?v=applogo_v2";
+            if (window.isMobileApp) {
+                document.getElementById("bundleLoaderProgressBar").style.display = "none";
+            }</script><noscript><style>body {
+                    background-color: white;
+                }</style><div style="background-color: white; position: absolute; left: 50%; top: 50%; -webkit-transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%)"><div style="text-align: center;object-fit: contain; display:iflex;max-width:100vh;height:60px;background-image:url(/noscript);background-repeat: no-repeat;"></div><p>It seems like scripting is disabled on your browser. Click here to see how to &nbsp;<a href="https://www.enable-javascript.com">Enable Javascript on your browser</a></p></div></noscript></body></html>
