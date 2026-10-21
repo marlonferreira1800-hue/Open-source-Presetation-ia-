@@ -18,6 +18,8 @@ from app.agent.orchestrator import TomoOrchestrator
 from app.scheduler.proactive_engine import proactive_scheduler
 from app.channels.telegram import telegram_channel
 from app.channels.whatsapp import whatsapp_channel
+from app.integrations.google_calendar import calendar_service
+from app.core.git_service import git_service
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -52,9 +54,10 @@ async def chat_endpoint(req: MessageRequest, db: AsyncSession = Depends(get_db))
     
     result = await orchestrator.process_user_turn(
         user_id=req.user_id,
-        user_message=req.message,
+        user_message=req.message or "",
         channel=req.channel,
-        image_base64=req.image_base64
+        image_base64=req.image_base64,
+        audio_base64=req.audio_base64
     )
     return MessageResponse(**result)
 
@@ -111,6 +114,31 @@ async def simulate_proactive_nudge(req: dict):
     trigger_type = req.get("trigger_type", "morning")
     nudge = await proactive_scheduler.generate_proactive_nudge(user_id, trigger_type)
     return nudge
+
+# --- Endpoints de Integração com Google Calendar ---
+
+@app.get("/api/v1/user/{user_id}/calendar")
+async def get_user_calendar(user_id: str):
+    events = await calendar_service.list_today_events(user_id)
+    return {"user_id": user_id, "events": events}
+
+@app.post("/api/v1/user/{user_id}/calendar/event")
+async def create_calendar_event(user_id: str, payload: dict):
+    summary = payload.get("summary", "Bloco de Foco")
+    time_str = payload.get("time", "18:00 - 19:00")
+    event = await calendar_service.schedule_event(user_id, summary, time_str)
+    return {"status": "created", "event": event}
+
+# --- Endpoints de Git Auto-Save & Sync ---
+
+@app.get("/api/v1/git/status")
+async def get_git_status():
+    return git_service.get_status()
+
+@app.post("/api/v1/git/auto-save")
+async def git_auto_save(payload: dict = None):
+    custom_msg = payload.get("message") if payload else None
+    return git_service.auto_commit_and_push(custom_msg)
 
 # --- Webhooks de Canais ---
 

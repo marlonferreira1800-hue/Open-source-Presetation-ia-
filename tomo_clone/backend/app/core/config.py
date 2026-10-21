@@ -10,9 +10,10 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///./tomo.db"
     
-    # LLM Provider Keys
+    # LLM & Audio Provider Keys
     GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", "")
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY", "")
+    GROQ_API_KEY: Optional[str] = os.getenv("GROQ_API_KEY", "")
     DEFAULT_MODEL: str = "gemini-1.5-flash"  # Custo-eficiente e multimodal
     
     # Messaging Channels
@@ -21,6 +22,10 @@ class Settings(BaseSettings):
     EVOLUTION_API_KEY: Optional[str] = os.getenv("EVOLUTION_API_KEY", "")
     EVOLUTION_INSTANCE_NAME: Optional[str] = os.getenv("EVOLUTION_INSTANCE_NAME", "tomo_bot")
     
+    # Git Auto-Sync Settings
+    AUTO_GIT_SYNC_ENABLED: bool = True
+    AUTO_GIT_SYNC_INTERVAL_MINUTES: int = 15
+
     # Scheduler Settings
     PROACTIVE_CHECKINS_ENABLED: bool = True
     MORNING_CHECKIN_HOUR: int = 8   # 08:00

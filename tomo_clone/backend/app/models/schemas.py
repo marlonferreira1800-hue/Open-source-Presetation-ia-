@@ -74,9 +74,10 @@ class MiniAppModel(Base):
 
 class MessageRequest(BaseModel):
     user_id: str
-    message: str
+    message: Optional[str] = ""
     channel: str = "web"
     image_base64: Optional[str] = None
+    audio_base64: Optional[str] = None
 
 class MessageResponse(BaseModel):
     reply: str

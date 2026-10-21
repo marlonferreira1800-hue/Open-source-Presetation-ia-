@@ -38,8 +38,14 @@
       </div>
     </div>
 
-    <!-- Active User Selector -->
+    <!-- Git Auto-Save & User Selector -->
     <div class="flex items-center space-x-2 text-xs">
+      <!-- Git Auto-Save Button -->
+      <button onclick="triggerGitAutoSave()" id="gitSyncBtn" class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/60 rounded-lg transition" title="Salvar e Comitar no GitHub">
+        <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+        <span id="gitBtnLabel" class="font-medium text-[11px]">Git Sync</span>
+      </button>
+
       <span class="text-slate-400 hidden sm:inline">Perfil:</span>
       <input type="text" id="userIdInput" value="marlon_dev" class="bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1 text-slate-200 text-xs focus:outline-none focus:border-indigo-500" title="ID do Usuário">
       <button onclick="refreshUserData()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition" title="Recarregar Dados">
@@ -79,13 +85,40 @@
         </div>
       </div>
 
-      <!-- Input Area -->
-      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex items-center space-x-2">
-        <input type="text" id="chatInput" placeholder="Ex: 'Quero treinar 4x na semana' ou 'Dormi às 23h hoje'..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" onkeydown="if(event.key === 'Enter') sendMessage()">
-        <button onclick="sendMessage()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl font-medium text-sm transition flex items-center space-x-1.5 shadow-lg shadow-indigo-600/25">
-          <span>Enviar</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-        </button>
+      <!-- Input Area with Multimodal Controls -->
+      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex flex-col space-y-2">
+        <!-- Image Preview Container -->
+        <div id="imagePreviewContainer" class="hidden items-center space-x-2 bg-slate-900 border border-slate-700/80 rounded-xl p-2 w-fit">
+          <img id="imagePreview" src="" alt="Preview" class="h-14 w-14 object-cover rounded-lg border border-slate-700">
+          <div class="flex flex-col pr-2">
+            <span class="text-[11px] font-medium text-slate-300">Foto Anexada</span>
+            <span class="text-[10px] text-slate-500">Refeição / Print / Recibo</span>
+            <button onclick="clearSelectedImage()" class="text-xs text-rose-400 hover:text-rose-300 text-left mt-0.5">Remover ✕</button>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <!-- Hidden File Input -->
+          <input type="file" id="imageFileInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+          
+          <!-- Image Attachment Button -->
+          <button type="button" onclick="document.getElementById('imageFileInput').click()" class="p-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-indigo-400 border border-slate-700 rounded-xl transition shadow-sm" title="Anexar foto de refeição, print ou recibo">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          </button>
+
+          <!-- Voice / Audio Record Button -->
+          <button type="button" id="recordAudioBtn" onclick="toggleVoiceRecording()" class="p-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 border border-slate-700 rounded-xl transition shadow-sm" title="Gravar mensagem de voz (Whisper)">
+            <svg id="micIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+            <span id="recordingIndicator" class="hidden w-3 h-3 rounded-full bg-rose-500 animate-ping"></span>
+          </button>
+
+          <input type="text" id="chatInput" placeholder="Digite uma meta, anexe uma foto ou grave um áudio..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" onkeydown="if(event.key === 'Enter') sendMessage()">
+          
+          <button onclick="sendMessage()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl font-medium text-sm transition flex items-center space-x-1.5 shadow-lg shadow-indigo-600/25">
+            <span>Enviar</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+        </div>
       </div>
     </section>
 
@@ -106,6 +139,22 @@
 
         <div id="miniAppsList" class="space-y-3">
           <p class="text-xs text-slate-500 text-center py-4">Nenhum Mini-App gerado ainda. Conte ao Tomo uma meta para gerar um!</p>
+        </div>
+      </div>
+
+      <!-- Google Calendar Sync Card -->
+      <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <span class="p-1.5 bg-blue-500/10 text-blue-400 rounded-lg">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </span>
+            <h2 class="font-semibold text-sm text-white">Google Calendar (Hoje)</h2>
+          </div>
+          <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 font-medium">Sincronizado</span>
+        </div>
+        <div id="calendarEventsContainer" class="space-y-1.5 text-xs">
+          <p class="text-slate-500 italic">Carregando agenda...</p>
         </div>
       </div>
 
@@ -143,33 +192,116 @@
 
   <script>
     const API_BASE = window.location.origin;
+    let selectedImageBase64 = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
 
     function getUserId() {
       return document.getElementById("userIdInput").value.trim() || "marlon_dev";
     }
 
+    function handleImageSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        selectedImageBase64 = e.target.result;
+        document.getElementById("imagePreview").src = selectedImageBase64;
+        const container = document.getElementById("imagePreviewContainer");
+        container.classList.remove("hidden");
+        container.classList.add("flex");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearSelectedImage() {
+      selectedImageBase64 = null;
+      document.getElementById("imageFileInput").value = "";
+      const container = document.getElementById("imagePreviewContainer");
+      container.classList.add("hidden");
+      container.classList.remove("flex");
+    }
+
+    async function toggleVoiceRecording() {
+      const recordBtn = document.getElementById("recordAudioBtn");
+      const micIcon = document.getElementById("micIcon");
+      const indicator = document.getElementById("recordingIndicator");
+
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = e => {
+            if (e.data.size > 0) audioChunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+              const audioBase64 = reader.result;
+              appendMessage("user", "🎙️ Mensagem de voz gravada...");
+              await sendPayload({ user_id: getUserId(), audio_base64: audioBase64, channel: "web" });
+            };
+            reader.readAsDataURL(audioBlob);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recordBtn.classList.add("bg-rose-950", "border-rose-500", "text-rose-400");
+          micIcon.classList.add("hidden");
+          indicator.classList.remove("hidden");
+        } catch (err) {
+          alert("Permissão de microfone negada ou indisponível no navegador.");
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        recordBtn.classList.remove("bg-rose-950", "border-rose-500", "text-rose-400");
+        micIcon.classList.remove("hidden");
+        indicator.classList.add("hidden");
+      }
+    }
+
     async function sendMessage() {
       const input = document.getElementById("chatInput");
       const text = input.value.trim();
-      if (!text) return;
+      const image = selectedImageBase64;
+
+      if (!text && !image) return;
 
       input.value = "";
-      appendMessage("user", text);
+      if (image && text) {
+        appendMessage("user", `[📸 Foto anexada]\n${text}`);
+      } else if (image) {
+        appendMessage("user", "[📸 Foto anexada enviada]");
+      } else {
+        appendMessage("user", text);
+      }
 
+      clearSelectedImage();
+
+      await sendPayload({
+        user_id: getUserId(),
+        message: text,
+        image_base64: image,
+        channel: "web"
+      });
+    }
+
+    async function sendPayload(payload) {
       try {
         const res = await fetch(`${API_BASE}/api/v1/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: getUserId(),
-            message: text,
-            channel: "web"
-          })
+          body: JSON.stringify(payload)
         });
         const data = await res.json();
         appendMessage("tomo", data.reply);
-        
-        // Atualiza memória e apps após resposta
         await refreshUserData();
       } catch (err) {
         appendMessage("tomo", "⚠️ Ops, erro ao se conectar ao backend. Verifique se o servidor está rodando.");
@@ -233,9 +365,33 @@
           const apps = await appRes.json();
           renderMiniApps(apps);
         }
+
+        // Buscar Google Calendar
+        const calRes = await fetch(`${API_BASE}/api/v1/user/${userId}/calendar`);
+        if (calRes.ok) {
+          const calData = await calRes.json();
+          renderCalendar(calData.events || []);
+        }
       } catch (e) {
         console.warn("Erro ao buscar dados do usuário:", e);
       }
+    }
+
+    function renderCalendar(events) {
+      const container = document.getElementById("calendarEventsContainer");
+      if (!events.length) {
+        container.innerHTML = '<p class="text-slate-500 italic">Nenhum compromisso para hoje.</p>';
+        return;
+      }
+      container.innerHTML = events.map(ev => `
+        <div class="bg-slate-800/60 border border-slate-700/50 rounded-lg p-2 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+            <span class="text-slate-200 font-medium">${ev.summary}</span>
+          </div>
+          <span class="text-blue-400 font-semibold text-[11px]">${ev.time || 'Hoje'}</span>
+        </div>
+      `).join('');
     }
 
     function renderGoals(goals) {
@@ -364,6 +520,31 @@
         await refreshUserData();
       } catch (e) {
         console.error("Erro ao marcar item:", e);
+      }
+    }
+
+    async function triggerGitAutoSave() {
+      const btn = document.getElementById("gitSyncBtn");
+      const label = document.getElementById("gitBtnLabel");
+      const originalText = label.innerText;
+
+      label.innerText = "Salvando...";
+      btn.classList.add("opacity-60", "pointer-events-none");
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/git/auto-save`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "auto-save: sync via Tomo Companion" })
+        });
+        const data = await res.json();
+        label.innerText = "Salvo no Git ✓";
+        setTimeout(() => { label.innerText = originalText; }, 2500);
+      } catch (err) {
+        label.innerText = "Erro ao salvar ✕";
+        setTimeout(() => { label.innerText = originalText; }, 2500);
+      } finally {
+        btn.classList.remove("opacity-60", "pointer-events-none");
       }
     }
 

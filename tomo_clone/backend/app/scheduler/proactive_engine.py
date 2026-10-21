@@ -6,6 +6,8 @@ from sqlalchemy.future import select
 from app.core.config import settings
 from app.core.db import AsyncSessionLocal
 from app.models.schemas import UserModel, GoalModel
+from app.integrations.google_calendar import calendar_service
+from app.core.git_service import git_service
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,18 @@ class ProactiveScheduler:
                 id="inactivity_check",
                 replace_existing=True
             )
+
+        if settings.AUTO_GIT_SYNC_ENABLED:
+            self.scheduler.add_job(
+                git_service.auto_commit_and_push,
+                "interval",
+                minutes=settings.AUTO_GIT_SYNC_INTERVAL_MINUTES,
+                id="git_auto_sync",
+                replace_existing=True
+            )
+            logger.info(f"Auto-Git Sync ativado: intervalo de {settings.AUTO_GIT_SYNC_INTERVAL_MINUTES} minutos.")
+
+        if settings.PROACTIVE_CHECKINS_ENABLED or settings.AUTO_GIT_SYNC_ENABLED:
             self.scheduler.start()
             logger.info("Scheduler proativo do Tomo iniciado.")
 
@@ -52,8 +66,15 @@ class ProactiveScheduler:
             goals = goals_res.scalars().all()
             goal_titles = [g.title for g in goals]
 
+            # Consultar eventos do Google Calendar para o briefing do dia
+            events = await calendar_service.list_today_events(user_id)
+            cal_summary = f" (Agenda: {len(events)} compromissos agendados)" if events else ""
+
             if trigger_type == "morning":
-                if goal_titles:
+                if events:
+                    ev_titles = ", ".join([f"{e.get('time', 'Hoje')}: {e.get('summary', 'Reunião')}" for e in events[:2]])
+                    msg = f"🌅 Bom dia! Consultei sua agenda no Google Calendar: você tem {ev_titles}. Qual horário livre vamos reservar para focar na meta de {goal_titles[0] if goal_titles else 'hoje'}?"
+                elif goal_titles:
                     msg = f"🌅 Bom dia! Hoje é um novo dia para avançar em: {', '.join(goal_titles)}. Qual é a sua prioridade nº 1 para esta manhã?"
                 else:
                     msg = "🌅 Bom dia! Preparado para o dia de hoje? Que hábito ou meta vamos focar hoje?"
