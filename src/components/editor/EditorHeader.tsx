@@ -11,7 +11,6 @@ import {
   Play, 
   Palette, 
   LayoutGrid, 
-  CloudCheck,
   Check,
   FileSpreadsheet,
   FileText,
